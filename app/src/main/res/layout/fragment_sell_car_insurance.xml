@@ -24,9 +24,8 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="250dp"
+                android:layout_height="300dp"
                 android:orientation="vertical"
-                android:gravity="center_vertical"
                 android:paddingBottom="20dp">
 
                 <LinearLayout
@@ -39,10 +38,11 @@
                     >
 
                     <ImageView
+                        android:id="@+id/iv_sell_car_insurance"
                         android:layout_width="56dp"
                         android:layout_height="56dp"
                         android:layout_weight="0.1"
-                        android:src="@drawable/price_filled"/>
+                        android:src="@drawable/insurance_unselected"/>
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -168,9 +168,10 @@
                     android:padding="10dp">
 
                     <ImageView
+                        android:id="@+id/iv_sell_car_kilometers"
                         android:layout_width="56dp"
                         android:layout_height="56dp"
-                        android:src="@drawable/uploadphoto"/>
+                        android:src="@drawable/kilometers_unselected"/>
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -186,7 +187,6 @@
                     android:id="@+id/ll_km_value"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:visibility="gone"
                     android:paddingTop="10dp"
                     android:paddingBottom="10dp"
                     android:paddingLeft="10dp"
@@ -198,6 +198,7 @@
                         android:id="@+id/et_km"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:inputType="number"
                         android:hint="Kms driven"
                         android:layout_gravity="center_vertical"
                         android:paddingLeft="10dp"
