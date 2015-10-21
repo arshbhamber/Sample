@@ -1,14 +1,13 @@
 package com.example.arsh.sample;
 
-import android.animation.ValueAnimator;
 import android.app.DatePickerDialog;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,10 +20,10 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
+import android.widget.RelativeLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 
-import java.lang.ref.WeakReference;
 import java.util.Calendar;
 
 /**
@@ -37,15 +36,12 @@ public class FragmentSellCarInsurance extends Fragment implements TextWatcher, V
     RadioButton rbComprehensive, rbthirdParty;
     View parentView;
     TextView tvDate;
-    LinearLayout llInsuranceDetails,llKilometerValue,llInsuranceHeader;
+    LinearLayout llInsuranceDetails,llInsuranceHeader;
     FloatingActionButton fabSubmit;
     DatePickerDialog datePickerDialog;
     EditText etKm;
     ImageView ivInsurance,ivKilometers;
-    RevealDrawable customDrawable;
-    ValueAnimator animator;
-    Drawable d1;
-    Drawable d2;
+    AnimatedDrawable kmAnimatedDrawable,insAnimatedDrawable;
 
 
     @Nullable
@@ -58,39 +54,16 @@ public class FragmentSellCarInsurance extends Fragment implements TextWatcher, V
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-
-        animator = ValueAnimator.ofFloat(0.0f,1.0f);
-        animator.setDuration(1000);
-        animator.setInterpolator(new AccelerateDecelerateInterpolator());
-        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-//               d1 = d1.getConstantState().newDrawable();
-//                d2 = d2.getConstantState().newDrawable();
-                customDrawable = new RevealDrawable(d1, d2, 1);
-                ivInsurance.setImageDrawable(customDrawable);
-                customDrawable.setLevel((int) (animation.getAnimatedFraction() * 5000.0f));
-
-
-            }
-        });
-
-
-        d1 = getResources().getDrawable(R.drawable.insurance_unselected);
-        d2 = getResources().getDrawable(R.drawable.insurance_selected);
-
-
-        customDrawable = new RevealDrawable(d1, d2, 1);
-
-
-
-
-
-        parentView = view ;
+        parentView = view;
         initViews();
+        kmAnimatedDrawable = new AnimatedDrawable(getContext(), R.drawable.kilometers_selected, R.drawable.kilometers_unselected, ivKilometers, 500);
+        insAnimatedDrawable  = new AnimatedDrawable(getContext(), R.drawable.insurance_selected, R.drawable.insurance_unselected, ivInsurance, 500);
+
+        ivInsurance.setImageDrawable(insAnimatedDrawable.getDrawable());
+        ivKilometers.setImageDrawable(kmAnimatedDrawable.getDrawable());
+
         setListeners();
 
-        ivInsurance.setImageDrawable(customDrawable);
         switchInsurance.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -110,31 +83,26 @@ public class FragmentSellCarInsurance extends Fragment implements TextWatcher, V
             }
         }, Calendar.YEAR,Calendar.MONTH,Calendar.DAY_OF_MONTH);
 
+
     }
 
     private void showViews() {
 
-
-
-
-
+        final float cardWidth = ((RelativeLayout)llInsuranceHeader.getParent()).getHeight()/2 - llInsuranceHeader.getHeight()/2;
         final Animation expandIn = AnimationUtils.loadAnimation(getActivity(), R.anim.expand_in);
 
-
         expandIn.setAnimationListener(new Animation.AnimationListener() {
+
             @Override
             public void onAnimationStart(Animation animation) {
 
-//                customDrawable = new RevealDrawable(d1,d2,1);
-                animator.start();
-                llInsuranceHeader.animate().translationY(0.0f).setDuration(400).setInterpolator(new AccelerateDecelerateInterpolator()).start();
+                insAnimatedDrawable.start();
+                llInsuranceHeader.animate().translationY(-cardWidth).setDuration(400).setInterpolator(new AccelerateDecelerateInterpolator()).start();
             }
 
             @Override
             public void onAnimationEnd(Animation animation) {
 
-//                animator.cancel();
-//                ivInsurance.setImageResource(R.drawable.insurance_selected);
 
             }
 
@@ -144,38 +112,28 @@ public class FragmentSellCarInsurance extends Fragment implements TextWatcher, V
             }
         });
 
-//        llInsuranceHeader.startAnimation(animation);
         llInsuranceDetails.startAnimation(expandIn);
         llInsuranceDetails.setVisibility(View.VISIBLE);
-//                llKilometerValue.setVisibility(View.VISIBLE);
-
-//        ivKilometers.setImageResource(R.drawable.kilometers_selected);
-//        llInsuranceHeader.animate().translationY(-100.0f).setDuration(400).setInterpolator(new AccelerateDecelerateInterpolator()).start();
 
     }
 
     private void hideViews() {
-
-        final float cardWidth = ((LinearLayout)llInsuranceHeader.getParent()).getHeight()/2 - llInsuranceHeader.getHeight()/2;
 
         Animation expandOut = AnimationUtils.loadAnimation(getActivity(), R.anim.expand_out);
         expandOut.setAnimationListener(new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {
 
-//                customDrawable = new RevealDrawable(d1,d2,1);
-                animator.reverse();
-                llInsuranceHeader.animate().translationY(cardWidth).setDuration(500).setInterpolator(new AccelerateDecelerateInterpolator()).start();
+                insAnimatedDrawable.reverse();
+                llInsuranceHeader.animate().translationY(0.0f).setDuration(500).setInterpolator(new AccelerateDecelerateInterpolator()).start();
 
             }
 
             @Override
             public void onAnimationEnd(Animation animation) {
 
-//                animator.cancel();
                 llInsuranceDetails.setVisibility(View.GONE);
                 ivInsurance.setImageResource(R.drawable.insurance_unselected);
-//                ivKilometers.setImageResource(R.drawable.kilometers_unselected);
             }
 
             @Override
@@ -184,8 +142,6 @@ public class FragmentSellCarInsurance extends Fragment implements TextWatcher, V
             }
         });
         llInsuranceDetails.startAnimation(expandOut);
-
-
 
 
     }
@@ -200,7 +156,6 @@ public class FragmentSellCarInsurance extends Fragment implements TextWatcher, V
     private void initViews() {
 
         llInsuranceDetails = (LinearLayout)parentView.findViewById(R.id.ll_insurance_details);
-        llKilometerValue = (LinearLayout)parentView.findViewById(R.id.ll_km_value);
         switchInsurance = (Switch)parentView.findViewById(R.id.switch_insurance);
         rbComprehensive = (RadioButton)parentView.findViewById(R.id.rb_comprehensive);
         rbthirdParty = (RadioButton)parentView.findViewById(R.id.rb_third_party);
@@ -231,12 +186,12 @@ public class FragmentSellCarInsurance extends Fragment implements TextWatcher, V
         if(etKm.getText().toString().length()>0) {
 
             fabSubmit.setVisibility(View.VISIBLE);
-            ivKilometers.setImageResource(R.drawable.kilometers_selected);
+            kmAnimatedDrawable.start();
         }
         else {
 
             fabSubmit.setVisibility(View.INVISIBLE);
-            ivKilometers.setImageResource(R.drawable.kilometers_unselected);
+            kmAnimatedDrawable.reverse();
         }
 
     }
@@ -249,8 +204,6 @@ public class FragmentSellCarInsurance extends Fragment implements TextWatcher, V
             case R.id.tv_date :
                 datePickerDialog.show();
                 break;
-
-
 
         }
 
